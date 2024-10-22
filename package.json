@@ -2,9 +2,9 @@
   "name": "be-gig-swiper-web",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "listen.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node listen.js",
     "test": "NODE_ENV=test jest",
     "development": "NODE_ENV=development node app.js"
   },
