@@ -186,13 +186,13 @@ describe('/api/saveGig',()=>{
 
 describe('/api/gigSearch/:stacknumber>',()=>{
     test('POST 200: gig search should return an object with gig info and spotify track info if an aritst name is found in the spotify api',()=>{
-        const locationObj={location:'Manchester'}
+        const locationObj={location:'Manchester',radius:10}
         return request(app)
         .post('/api/gigSearch/10')
         .expect(200)
         .send(locationObj)
         .then(({body})=>{
-            expect(body).toEqual(
+                    expect(body).toEqual(
                     expect.objectContaining({
                     eventname: expect.any(String),
                     venue: expect.any(String),
@@ -216,7 +216,7 @@ describe('/api/gigSearch/:stacknumber>',()=>{
     })
 
     test('POST 404: if a location parameter of an invalid data is submitted a status of 404 is returned and an error message',()=>{
-        const locationObj={location:9999}
+        const locationObj={location:9999,radius:10}
         return request(app)
         .post('/api/gigSearch/1')
         .expect(404)
@@ -226,7 +226,7 @@ describe('/api/gigSearch/:stacknumber>',()=>{
         })
     }) 
     test('POST 404: if a valid string location parameter is submitted but no gigs are found, then a status of 204 is returned with a message',()=>{
-        const locationObj={location:'SmileyTown'}
+        const locationObj={location:'SmileyTown',radius:10}
         return request(app)
         .post('/api/gigSearch/1')
         .expect(404)
@@ -236,7 +236,7 @@ describe('/api/gigSearch/:stacknumber>',()=>{
         })
     })
     test('Post 404: if a blank or whitespaced location is submitted, a status of 404 is returned with an error message',()=>{
-    const locationObj = {location:''}
+    const locationObj = {location:'',radius:10}
     return request(app)
     .post('/api/gigSearch/1')
     .expect(404)

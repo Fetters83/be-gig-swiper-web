@@ -1,7 +1,7 @@
 
 const { fetchLatitudeAndLongitude, getAllEvents, getSpotifyToken, getArtistTopTrack } = require('../externalApi');
 
-function fetchGigs(stackNumber,location){
+function fetchGigs(stackNumber,location,radius){
 
     let gigStack={};
     let gigInfo
@@ -24,7 +24,7 @@ function fetchGigs(stackNumber,location){
     }).then(({latitude,longitude})=>{
         
        
-        return getAllEvents(latitude,longitude,5)
+        return getAllEvents(latitude,longitude,radius || 5)
     }).then((gigs)=>{
         gigInfo = gigs[stackNumber];     
         gigStack.eventname=gigInfo.eventname  || null
