@@ -1,7 +1,7 @@
 
 const { fetchLatitudeAndLongitude, getAllEvents, getSpotifyToken, getArtistTopTrack } = require('../externalApi');
 
-function fetchGigs(stackNumber,location,radius){
+function fetchGigs(location,radius){
 
     let gigStack={};
     let gigInfo
@@ -26,7 +26,7 @@ function fetchGigs(stackNumber,location,radius){
        
         return getAllEvents(latitude,longitude,radius || 5)
     }).then((gigs)=>{
-        gigInfo = gigs[stackNumber];     
+ /*        gigInfo = gigs[stackNumber];     
         gigStack.eventname=gigInfo.eventname  || null
         gigStack.venue=gigInfo.venue.name|| null
         gigStack.date=gigInfo.date|| null
@@ -45,8 +45,15 @@ function fetchGigs(stackNumber,location,radius){
                return Promise.resolve({gigStack})
             }
 
-        return gigStack
-    }).then((result)=>{
+        return gigStack */
+       /*  console.log(gigs[0]) */
+        if(gigs.length===0){
+            return Promise.reject({status:404,msg:'No events found in this location'})
+        }
+     /*    console.log(gigs[1])
+        console.log(gigs[2]) */
+        return gigs
+    })/* .then((result)=>{
         if (gigStack.artistname === null) return result;
         return getSpotifyToken()
     }).then((accessToken)=>{
@@ -64,7 +71,7 @@ function fetchGigs(stackNumber,location,radius){
         gigStack.preview_url = topTrack.preview_url
         
         return gigStack
-    })
+    }) */
     
 
 }

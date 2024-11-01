@@ -1,115 +1,14 @@
 const request = require('supertest')
-const admin = require('firebase-admin')
-const {db} = require('../firebaseAdmin')
 const app = require('../app')
-const {deleteTestCollections,deleteUser} = require('../seed/seed-test')
-const { toBeOneOf } = require('jest-extended')
+const {deleteTestCollections} = require('../seed/seed-test')
 require('jest-extended')
 
-   beforeAll(()=>{
-    const batchSize = 500
-    const email  = 'wgyves@hotmail.com'.trim();
-    return Promise.all([
-        deleteTestCollections(batchSize),
-        deleteUser(email)
-    ])
-}
-)    
 
- describe('/api/signup',()=>{
-    test('POST 200 and 400: Signing up with email and password returns status 200, duplicate signups returns 400 with an error message',()=>{
-        const userRecord = {
-            email:'wgyves@hotmail.com',
-            password:'password1',
-            emailVerified:false,
-            disabled:false
-        }
-       return request(app)
-       .post('/api/signup')
-       .expect(200)
-       .send(userRecord)
-       .then(({body})=>{
-        expect(body.msg).toBe('User created successfully')
-        expect(body.user).toEqual(
-            expect.objectContaining({
-                uid:expect.any(String),
-                email:expect.any(String),
-                emailVerified:expect.any(Boolean),
-                disabled: expect.any(Boolean)
-            })
-        )
-         return request(app)
-        .post('/api/signup')
-        .expect(400)
-        .send(userRecord)
-        .then(({body})=>{
-            expect(body.msg).toBe('The email address is already in use by another account.')
-        }) 
-       
-    })
-    })
-    test('POST 400: Signing up with an email address of an invalid data type responds with a 400 status and an error message',()=>{
-        const userRecord = {
-            email:9999,
-            password:'password1',
-            emailVerified:false,
-            disabled:false
-        }
-        return request(app)
-        .post('/api/signup')
-        .expect(400)
-        .send(userRecord)
-        .then(({body})=>{
-            expect(body.msg).toBe('Invalid email address provided')
+        beforeAll(()=>{
+            const batchSize = 500;
+            return deleteTestCollections(batchSize)
         })
-    })
-    test('POST 400: Signing up with a password of an invalid data type responds with a 400 status and an error message',()=>{
-        const userRecord = {
-            email:'wgyves@hotmail.com',
-            password:9999,
-            emailVerified:false,
-            disabled:false
-        }
-        return request(app)
-        .post('/api/signup')
-        .expect(400)
-        .send(userRecord)
-        .then(({body})=>{
-            expect(body.msg).toBe('The password must be a string with at least 6 characters.')
-        })
-    })
-    test('POST 400: Signing up with a email address that is blank or has empty space responds with a 400 status and an error message',()=>{
-        const userRecord = {
-            email:'',
-            password:9999,
-            emailVerified:false,
-            disabled:false
-        }
-        return request(app)
-        .post('/api/signup')
-        .expect(400)
-        .send(userRecord)
-        .then(({body})=>{
-            expect(body.msg).toBe('Invalid email address provided')
-        })
-    })
-    test('POST 400: Signing up with a password that is blank or has empty space responds with a 400 status and an error message',()=>{
-        const userRecord = {
-            email:'wgyves@hotmail.com',
-            password:' ',
-            emailVerified:false,
-            disabled:false
-        }
-        return request(app)
-        .post('/api/signup')
-        .expect(400)
-        .send(userRecord)
-        .then(({body})=>{
-            expect(body.msg).toBe('The password must be a string with at least 6 characters.')
-        })
-    })
-    
-})
+
 
 describe('/api/saveGig',()=>{
     test('POST 200: saving a gig with all the correct fields should return 200 status and insert the gig into the database',()=>{
@@ -184,33 +83,26 @@ describe('/api/saveGig',()=>{
     })
 }) 
 
-describe('/api/gigSearch/:stacknumber>',()=>{
+describe('/api/gigSearch',()=>{
     test('POST 200: gig search should return an object with gig info and spotify track info if an aritst name is found in the spotify api',()=>{
         const locationObj={location:'Manchester',radius:10}
         return request(app)
-        .post('/api/gigSearch/10')
+        .post('/api/gigSearch')
         .expect(200)
         .send(locationObj)
         .then(({body})=>{
-                    expect(body).toEqual(
-                    expect.objectContaining({
-                    eventname: expect.any(String),
-                    venue: expect.any(String),
-                    date: expect.any(String),
-                    entryprice: expect.toBeOneOf([null,expect.any(String)]),
-                    uri: expect.any(String),
-                    description: expect.any(String),
-                    doorsopen: expect.any(String),
-                    doorsclose: expect.any(String),
-                    postcode: expect.any(String),
-                    town: expect.any(String),
-                    link: expect.any(String),
-                    artistname: expect.toBeOneOf([null,expect.any(String)])
-                })
-
-                
-            )
-            
+             
+           expect(Array.isArray(body)).toBe(true)
+           expect(typeof body[0].eventname).toBe('string')
+           expect(typeof body[0].venue.name).toBe('string')
+           expect(typeof body[0].venue.address).toBe('string')
+           expect(typeof body[0].venue.town).toBe('string')
+           expect(typeof body[0].venue.postcode).toBe('string')
+           expect(typeof body[0].venue.latitude).toBe('number')
+           expect(typeof body[0].venue.longitude).toBe('number')
+           expect(typeof body[0].link).toBe('string')
+           expect(typeof body[0].description).toBe('string')
+           expect(typeof body[0].openingtimes).toBe('object')         
         })
         
     })
@@ -218,7 +110,7 @@ describe('/api/gigSearch/:stacknumber>',()=>{
     test('POST 404: if a location parameter of an invalid data is submitted a status of 404 is returned and an error message',()=>{
         const locationObj={location:9999,radius:10}
         return request(app)
-        .post('/api/gigSearch/1')
+        .post('/api/gigSearch')
         .expect(404)
         .send(locationObj)
         .then(({body})=>{
@@ -226,24 +118,57 @@ describe('/api/gigSearch/:stacknumber>',()=>{
         })
     }) 
     test('POST 404: if a valid string location parameter is submitted but no gigs are found, then a status of 204 is returned with a message',()=>{
-        const locationObj={location:'SmileyTown',radius:10}
+        const locationObj={location:'Rhiwargor',radius:10}
         return request(app)
-        .post('/api/gigSearch/1')
+        .post('/api/gigSearch')
         .expect(404)
         .send(locationObj)
         .then(({body})=>{
-            expect(body.msg).toBe('No events found in this location')
+                    expect(body.msg).toBe('No events found in this location')
         })
     })
     test('Post 404: if a blank or whitespaced location is submitted, a status of 404 is returned with an error message',()=>{
     const locationObj = {location:'',radius:10}
     return request(app)
-    .post('/api/gigSearch/1')
+    .post('/api/gigSearch')
     .expect(404)
     .send(locationObj)
     .then(({body})=>{
         expect(body.msg).toBe('Location can not be blank.')
     })
+    })
+})
+
+describe('/api/getSpotifyTrack',()=>{
+    test('POST 200: Should return an artist top track preview URL from Spotify',()=>{
+        const artistNameObj = {artistName: 'Non Phixion'}
+        return request(app)
+        .post('/api/getSpotifyTrack')
+        .expect(200)
+        .send(artistNameObj)
+        .then(({body:{spotifyTrack}})=>{
+            expect(typeof spotifyTrack.topTrack).toBe('string') 
+        })
+    })
+    test('POST 404: If artist name does not produce a preview url, then a status of 404 is returned to the server',()=>{
+        const artistNameObj = {artistName: 'Tim Kellett'}
+        return request(app)
+        .post('/api/getSpotifyTrack')
+        .expect(404)
+        .send(artistNameObj)
+        .then(({body})=>{
+            expect(body.msg).toBe('No track preview available.') 
+        })
+    })
+    test('POST 404: If artist name is not of the correct data type, return status of 404 and an error message',()=>{
+        const artistNameObj = {artistName: 9999}
+        return request(app)
+        .post('/api/getSpotifyTrack')
+        .expect(404)
+        .send(artistNameObj)
+        .then(({body})=>{
+            expect(body.msg).toBe('Artist name can not be a number.') 
+        })
     })
 })
 

@@ -47,13 +47,4 @@ function deleteTestCollections(batchSize){
     })
 }
 
-function deleteUser(email){
-    return firebaseAdmin.auth().getUserByEmail(email).then((userRecord)=>{
-         return firebaseAdmin.auth().deleteUser(userRecord.uid)
-    }).then(()=>{
-        return Promise.resolve();
-    }).catch((err)=>{
-        return Promise.reject(err)
-    })
-}
-module.exports = {deleteTestCollections,deleteUser}
+module.exports = {deleteTestCollections}
