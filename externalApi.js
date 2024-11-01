@@ -76,10 +76,10 @@ function fetchArtistId(spotifyToken, requiredArtistsName) {
         }
     )
     .then((response) => {
-        console.log(response)
+       /*  console.log(response) */
         let artists = response.data.artists.items
-        console.log(artists)
-        return getRequiredArtistId(requiredArtistsName, artists)
+         /*console.log(artists)*/ 
+         return getRequiredArtistId(requiredArtistsName, artists)
     })
     .catch((error) => {
         return Promise.reject(error)
@@ -92,7 +92,7 @@ function getRequiredArtistId(requiredArtistsName, artists) {
         return artist.name.toLowerCase() === requiredArtistsName.toLowerCase()
     });
     if (matchingArtist.length > 0) {
-        return matchingArtist[0].id
+          return matchingArtist[0].id
     } else {
         return Promise.reject("no matching artist found")
     }
@@ -100,7 +100,7 @@ function getRequiredArtistId(requiredArtistsName, artists) {
 
 
 function fetchArtistTopTracks(spotifyToken, artistId) {
-    return axios.get(`https://api.spotify.com/v1/artists/${artistId}/top-tracks`, {
+     return axios.get(`https://api.spotify.com/v1/artists/${artistId}/top-tracks`, {
         params: {
             market: "GB",
         },
@@ -110,7 +110,7 @@ function fetchArtistTopTracks(spotifyToken, artistId) {
         }
     )
     .then((response) => {
-        return {topTracks: response.data.tracks}
+          return {topTracks: response.data.tracks}
     })
     .catch((error) => {
         console.log('fetchArtistTopTracks error caught:', error);
@@ -121,15 +121,21 @@ function fetchArtistTopTracks(spotifyToken, artistId) {
  function getArtistTopTrack(artistName,spotifyToken) {
     return fetchArtistId(spotifyToken, artistName)
     .then((artistId) => {
-        console.log(artistId)
+     
         return fetchArtistTopTracks(spotifyToken, artistId)
     })
     .then(({ topTracks }) => {
-        let topTrack = topTracks[0]
+    
+         if(topTracks.length === 0){
+           return Promise.reject({status:404,msg:'No track preview available.'})
+         } 
+
+         let topTrack = topTracks[1].preview_url
         return topTrack
     })
     .catch((error) => {
-        console.log('getArtistTopTrack error caught:', error);
+        return Promise.reject(error)
+        
     })
 }
 

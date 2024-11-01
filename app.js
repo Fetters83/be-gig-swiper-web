@@ -1,20 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const {postNewUser} = require('./controllers/signup.controllers');
-const { postCredentials } = require('./controllers/signin.controllers');
 const { postSavedGig } = require('./controllers/savegig.controllers');
 const { getGigs } = require('./controllers/gigSearch.controllers');
+const { getSpotifyTrack } = require('./controllers/getSpotifyTrack.controllers');
 
 
 
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/signup',postNewUser)
-app.post('api/signin',postCredentials)
 app.post('/api/saveGig',postSavedGig)
-app.post('/api/gigSearch/:stackNumber',getGigs)
+app.post('/api/gigSearch',getGigs)
+app.post('/api/getSpotifyTrack',getSpotifyTrack)
 
 
 app.use((err,req,res,next)=>{
