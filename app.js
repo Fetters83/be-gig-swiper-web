@@ -4,6 +4,7 @@ const app = express();
 const { postSavedGig } = require('./controllers/savegig.controllers');
 const { getGigs } = require('./controllers/gigSearch.controllers');
 const { getSpotifyTrack } = require('./controllers/getSpotifyTrack.controllers');
+const { getLikedGigs } = require('./controllers/getLikedGigs.controllers');
 
 
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.post('/api/saveGig',postSavedGig)
 app.post('/api/gigSearch',getGigs)
 app.post('/api/getSpotifyTrack',getSpotifyTrack)
+app.get('/api/getLikedGigs/:userEmail',getLikedGigs)
 
 
 app.use((err,req,res,next)=>{
