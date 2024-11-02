@@ -170,5 +170,68 @@ describe('/api/getSpotifyTrack',()=>{
             expect(body.msg).toBe('Artist name can not be a number.') 
         })
     })
+describe('/api/getLikedGigs/:userEmail',()=>{
+    test('GET 200: If a valid user email address is submitted, the server will respond with an array containing all the users liked gigs',()=>{
+            const likedGigObj = {
+                email:'wgyves@hotmail.com',
+                id:3,
+                title:'Leeds Event',
+                location:'Leeds Bar',
+                imageurl:'www.url.com',
+                description:'test gig',
+                eventname:'test event',
+                doorsopening:'19:00',
+                doorsclosing:'00:00',
+                lastentry:'22:00',
+                date:'08-10-2024',
+                town:'Leeds',
+                postcode:'LS1 4BH',
+                link:'test link'
+            }
+            return request(app)
+            .post('/api/saveGig')
+            .expect(200)
+            .send(likedGigObj)
+            .then(()=>{
+                
+                return request(app)
+                .get('/api/GetLikedGigs/wgyves@hotmail.com')
+                .expect(200)
+                .then(({body})=>{
+                    expect(Array.isArray(body)).toBe(true)
+                    expect(typeof body[0].id).toBe('number')
+                    expect(typeof body[0].title).toBe('string')
+                    expect(typeof body[0].location).toBe('string')
+                    expect(typeof body[0].imageurl).toBe('string')
+                    expect(typeof body[0].description).toBe('string')
+                    expect(typeof body[0].eventname).toBe('string')
+                    expect(typeof body[0].doorsopening).toBe('string')
+                    expect(typeof body[0].doorsclosing).toBe('string')
+                    expect(typeof body[0].lastentry).toBe('string')
+                    expect(typeof body[0].date).toBe('string')
+                    expect(typeof body[0].town).toBe('string')
+                    expect(typeof body[0].postcode).toBe('string')
+                    expect(typeof body[0].link).toBe('string')        
+                })
+            })
+        })
+        test('GET 200: If no liked gigs are saved against the users email, then an empty array is returned',()=>{
+            return request(app)
+            .get('/api/getLikedGigs/notanemail@email.com')
+            .expect(200)
+            .then(({body})=>{
+                expect(Array.isArray(body)).toBe(true)
+                expect(body.length).toBe(0)
+            })
+        })
+        test('GET 400: If user email is not a valid email address syntax a staus of 400 is returned with an an error message',()=>{
+            return request(app)
+            .get('/api/getLikedGigs/NOTANEMAIL')
+            .expect(400)
+            .then(({body})=>{
+                expect(body.msg).toBe('Invalid email address provided.')
+            })
+        })
+    })
 })
 
