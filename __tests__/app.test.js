@@ -71,7 +71,7 @@ describe('/api/saveGig',()=>{
             date:'08-10-2024',
             town:'Leeds',
             postcode:'LS1 4BH',
-            link:'test link'
+            /* link:'test link' */
         }
         return request(app)
         .post('/api/saveGig')
