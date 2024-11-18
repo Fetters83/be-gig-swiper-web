@@ -56,10 +56,10 @@ describe('/api/saveGig',()=>{
         })
 
     })
-    test('POST 400: Saving a gig with any of the fields missing should return status 400 and an error message',()=>{
+    test('POST 400: Saving a gig without the id field should return status 400 and an error message',()=>{
         const likedGigObj = {
             email:'wgyves@hotmail.com',
-            id:2,
+            id:'',
             title:'',
             location:'Leeds Bar',
             imageurl:'www.url.com',
@@ -71,14 +71,14 @@ describe('/api/saveGig',()=>{
             date:'08-10-2024',
             town:'Leeds',
             postcode:'LS1 4BH',
-            /* link:'test link' */
+            link:'test link'
         }
         return request(app)
         .post('/api/saveGig')
         .expect(400)
         .send(likedGigObj)
         .then(({body})=>{
-            expect(body.msg).toBe('There has been an error saving this gig')
+            expect(body.msg).toBe('Gig ID is required')
         })
     })
 }) 
@@ -91,7 +91,6 @@ describe('/api/gigSearch',()=>{
         .expect(200)
         .send(locationObj)
         .then(({body})=>{
-             
            expect(Array.isArray(body)).toBe(true)
            expect(typeof body[0].eventname).toBe('string')
            expect(typeof body[0].venue.name).toBe('string')
