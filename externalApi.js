@@ -2,15 +2,22 @@ const axios  = require('axios');
 const Buffer = require('buffer/').Buffer
 const client_id = process.env.SPOTIFY_CLIENT_ID
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET
+const position_stack_key = process.env.POSITION_STACK_KEY
 
 function fetchLatitudeAndLongitude(location){
+    const params = {
+        access_key:position_stack_key,
+        query:`${location}, UK`
+    }
     return axios
-    .get(`https://nominatim.openstreetmap.org/search?q=gb%20${location}&format=json&addressdetails=1&limit=1&polygon_svg=1`)
-    .then(({data})=>{
+    .get(`http://api.positionstack.com/v1/forward`,{params})
+    .then(({data:{data}})=>{
         if(data.length === 0){
             return {msg:'no data'}
         }
-        return { latitude: data[0].lat, longitude: data[0].lon , errorPlaceHolder : data[0].osm_id };
+       return { latitude: data[0].latitude, longitude: data[0].longitude};
+    }).catch((err)=>{
+        return err
     })
 }
 
@@ -28,15 +35,15 @@ function getAllEvents(latitude, longitude, radius) {
             }
         )
         .then(({ data }) => {
-           
             return data.results;
+        }).catch((err)=>{
+            return Promise.reject(err)
         });
 }
 
 
 function getSpotifyToken() {
     const url = 'https://accounts.spotify.com/api/token';
-
     const authOptions = {
         params: {
             client_id: client_id,
@@ -57,7 +64,7 @@ function getSpotifyToken() {
         return response.data.access_token;
     })
     .catch((error) => {
-        console.log('in getSpotifyToken error caught:', error);
+        return Promise.reject(error)
     });
 }
 
@@ -76,10 +83,8 @@ function fetchArtistId(spotifyToken, requiredArtistsName) {
         }
     )
     .then((response) => {
-       /*  console.log(response) */
         let artists = response.data.artists.items
-         /*console.log(artists)*/ 
-         return getRequiredArtistId(requiredArtistsName, artists)
+        return getRequiredArtistId(requiredArtistsName, artists)
     })
     .catch((error) => {
         return Promise.reject(error)
@@ -113,7 +118,7 @@ function fetchArtistTopTracks(spotifyToken, artistId) {
           return {topTracks: response.data.tracks}
     })
     .catch((error) => {
-        console.log('fetchArtistTopTracks error caught:', error);
+        return Promise.reject(error)
     })
 }
 

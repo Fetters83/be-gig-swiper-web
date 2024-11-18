@@ -16,10 +16,7 @@ const collection_id = config.collection_id
 function insertSavedGig(email,id,title,location,imageurl,description,eventname,doorsopening,doorsclosing,
     lastentry,date,town,postcode,link){
 
-        //const regex = /^(?!\s*$).+/
-        const regex = /^.*$/
-
-            const likedGigObj = {
+                const likedGigObj = {
             id:id || '',
             title:title || '',
             location:location || '',
@@ -35,11 +32,9 @@ function insertSavedGig(email,id,title,location,imageurl,description,eventname,d
             link:link || ''
         }
         
-        for(key in likedGigObj){
-            if(regex.test(likedGigObj[key])===false || !likedGigObj[key]){
-                return Promise.reject({status:400,msg:'There has been an error saving this gig'})
-            }
-        }
+     if(!id){
+        return Promise.reject({ status: 400, msg: 'Gig ID is required' });
+     }
         const docRef = db.collection(collection_id).doc(email)
 
         return docRef.update({
