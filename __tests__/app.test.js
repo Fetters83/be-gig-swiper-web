@@ -233,4 +233,38 @@ describe('/api/getLikedGigs/:userEmail',()=>{
         })
     })
 })
+describe('/api/removeGig/:userEmail&id=eventid',()=>{
+    test('DELETE 200: when a gig valid gig id is presented and deleted from the liked gigs array the server responds with 200',()=>{
+        return request(app)
+        .delete('/api/removeGig/wgyves@hotmail.com?id=3')
+        .expect(200)
+        .then(({body:removedGig})=>{
+            expect(removedGig.msg).toBe('Gig successfully deleted.')
+        })
+    })
+    test('DELETE 400: when a gig id to be deleted is provided which does not exists in the array a status of 400 is returned with an error message',()=>{
+        return request(app)
+        .delete('/api/removeGig/wgyves@hotmail.com?id=9999')
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe('Gig not found in likedgigs array.')
+        })
+    })
+    test('DELETE 400: when an invalid gig id to be deleted is provided which does not exists in the array a status of 400 is returned with an error message',()=>{
+        return request(app)
+        .delete('/api/removeGig/wgyves@hotmail.com?id=XXXX')
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe('Gig id not valid.')
+        })
+    })
+    test('DELETE 400: when an email provided as a document id to delete a gig does not exist a status of 400 is returned with an error message',()=>{
+        return request(app)
+        .delete('/api/removeGig/bgyves@hotmail.com?id=1')
+        .expect(400)
+        .then(({body})=>{
+            expect(body.msg).toBe('User doc does not exist.')
+        })
+    })
+})
 
