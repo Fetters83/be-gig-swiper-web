@@ -24,11 +24,10 @@ function deleteGig(email,id){
             }
            
             const gigToRemove = likedGigs.find(gig =>
-                gig.id === Number(id)
+                Number(gig.id) === Number(id)
              );
 
             if (!gigToRemove) {
-                console.log('in !gigToRemove')
                 return Promise.reject({status:400,msg:'Gig not found in likedgigs array.'});
             }
 
