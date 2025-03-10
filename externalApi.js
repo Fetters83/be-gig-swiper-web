@@ -29,6 +29,7 @@ function getAllEvents(latitude, longitude, radius) {
                     latitude: latitude,
                     longitude: longitude,
                     radius: radius,
+                    eventcode:"LIVE,CLUB",
                     limit: 100,
                     description:true
                 },
