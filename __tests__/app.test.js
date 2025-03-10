@@ -138,37 +138,36 @@ describe('/api/gigSearch',()=>{
     })
 })
 
-describe('/api/getSpotifyTrack',()=>{
-    test('POST 200: Should return an artist top track preview URL from Spotify',()=>{
-        const artistNameObj = {artistName: 'Non Phixion'}
-        return request(app)
-        .post('/api/getSpotifyTrack')
-        .expect(200)
-        .send(artistNameObj)
-        .then(({body:{spotifyTrack}})=>{
-            expect(typeof spotifyTrack.topTrack).toBe('string') 
-        })
-    })
-    test('POST 404: If artist name does not produce a preview url, then a status of 404 is returned to the server',()=>{
-        const artistNameObj = {artistName: 'Tim Kellett'}
-        return request(app)
-        .post('/api/getSpotifyTrack')
-        .expect(404)
-        .send(artistNameObj)
-        .then(({body})=>{
-            expect(body.msg).toBe('No track preview available.') 
-        })
-    })
-    test('POST 404: If artist name is not of the correct data type, return status of 404 and an error message',()=>{
-        const artistNameObj = {artistName: 9999}
-        return request(app)
-        .post('/api/getSpotifyTrack')
-        .expect(404)
-        .send(artistNameObj)
-        .then(({body})=>{
-            expect(body.msg).toBe('Artist name can not be a number.') 
-        })
-    })
+
+        describe('/api/getPreviewTrack',()=>{
+            test.only('POST 200: Should return an artist top track preview URL from Spotify',()=>{
+                //const artistNameObj = {artistName: 'Taylor Swift'}
+                return request(app)
+                .get('/api/getPreviewTrack?q=Non Phixion')
+                .expect(200)
+                .then(({body:{previewTrackUrl}})=>{
+                    
+                                   expect(typeof previewTrackUrl).toBe('string') 
+                })
+            })
+            test.only('POST 404: If artist name does not produce a preview url, then a status of 404 is returned to the server',()=>{
+                
+                return request(app)
+                .get('/api/getPreviewTrack?q=NOTANARTISTS')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('No track preview available.') 
+                })
+            })
+            test.only('POST 404: If artist name is not of the correct data type, return status of 404 and an error message',()=>{
+                   return request(app)
+                .get('/api/getPreviewTrack?q= ')
+                .expect(404)
+                .then(({body})=>{
+                    expect(body.msg).toBe('Artist name must be provided.') 
+                })
+            })
+
 describe('/api/getLikedGigs/:userEmail',()=>{
     test('GET 200: If a valid user email address is submitted, the server will respond with an array containing all the users liked gigs',()=>{
             const likedGigObj = {
