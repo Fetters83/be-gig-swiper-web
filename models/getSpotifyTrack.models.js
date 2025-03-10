@@ -13,6 +13,7 @@ function fetchSpotifyTrack(artistName){
    }).then((topTrack)=>{
     return topTrack
    }).catch((error)=>{
+      console.log("in model",error)
       return Promise.reject(error)
    })
     

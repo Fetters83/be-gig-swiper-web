@@ -6,6 +6,7 @@ const { getGigs } = require('./controllers/gigSearch.controllers');
 const { getSpotifyTrack } = require('./controllers/getSpotifyTrack.controllers');
 const { getLikedGigs } = require('./controllers/getLikedGigs.controllers');
 const { removeGig } = require('./controllers/removeGig.controllers');
+const { getPreviewTrack } = require('./controllers/getPreviewTrack.controller');
 
 
 
@@ -17,6 +18,7 @@ app.post('/api/gigSearch',getGigs)
 app.post('/api/getSpotifyTrack',getSpotifyTrack)
 app.get('/api/getLikedGigs/:userEmail',getLikedGigs)
 app.delete('/api/removeGig/:userEmail',removeGig)
+app.get('/api/getPreviewTrack',getPreviewTrack)
 
 
 app.use((err,req,res,next)=>{

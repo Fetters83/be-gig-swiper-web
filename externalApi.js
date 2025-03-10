@@ -61,9 +61,11 @@ function getSpotifyToken() {
 
     return axios.post(url, null, authOptions)
     .then((response) => {
+        console.log(response.data.access_token)
         return response.data.access_token;
     })
     .catch((error) => {
+        console.log("in external api:",error)
         return Promise.reject(error)
     });
 }
@@ -115,6 +117,7 @@ function fetchArtistTopTracks(spotifyToken, artistId) {
         }
     )
     .then((response) => {
+        console.log("120 fetchArtistTopTrack response",response.data.tracks)
           return {topTracks: response.data.tracks}
     })
     .catch((error) => {
@@ -126,6 +129,7 @@ function fetchArtistTopTracks(spotifyToken, artistId) {
  function getArtistTopTrack(artistName,spotifyToken) {
     return fetchArtistId(spotifyToken, artistName)
     .then((artistId) => {
+        console.log("131 - getArtistTopTrack artistId:",artistId)
      
         return fetchArtistTopTracks(spotifyToken, artistId)
     })
@@ -144,5 +148,27 @@ function fetchArtistTopTracks(spotifyToken, artistId) {
     })
 }
 
+function fetchDeezerPreviewTrack(artistName){
+     return axios.get(`https://api.deezer.com/search/artist?strict=on&q=${artistName}`).then(({data})=>{
+      let topTracksUrl = ''
+  
+        if(!data || !data.data || data.data.length === 0) {
+            return Promise.reject({status:404,msg:'No track preview available.'})
+        } else {
+           topTracksUrl = data.data[0].tracklist
+        }
+        return axios.get(topTracksUrl) 
+      
+    }).then(({data})=>{
+        if(!data.data || data.data.length === 0) {
+            return Promise.reject({status:404,msg:'No track preview available.'})
+        }
+        const topTrackUrl = data.data[0].preview
+        return topTrackUrl
+    }).catch((err)=>{
+      
+        return Promise.reject(err)
+    })
+}
 
-module.exports = {fetchLatitudeAndLongitude,getAllEvents,getSpotifyToken,getArtistTopTrack,fetchArtistId,fetchArtistTopTracks,getRequiredArtistId}
+module.exports = {fetchLatitudeAndLongitude,getAllEvents,getSpotifyToken,getArtistTopTrack,fetchArtistId,fetchArtistTopTracks,getRequiredArtistId,fetchDeezerPreviewTrack}
